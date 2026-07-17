@@ -10,7 +10,7 @@
 ## 📺 تجربة حية للمشروع (Video Demo)
 
 <!-- https://youtube.com/shorts/a2lFLFTfwNQ?feature=share -->
-<video src="رابط_الفيديو" width="100%" controls></video>
+<video src="[اضغط هنا](https://youtube.com/shorts/a2lFLFTfwNQ?feature=share)" width="100%" controls></video>
 
 ---
 
