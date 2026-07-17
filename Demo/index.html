@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محاكي البطاقة الآمنة المؤقتة</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: #f8fafc;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* لوحة التحكم والمدخلات */
+        .control-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            color: #38bdf8;
+            margin-bottom: 10px;
+            border-bottom: 2px solid rgba(56, 189, 248, 0.2);
+            padding-bottom: 8px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+
+        input {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(15, 23, 42, 0.6);
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: #38bdf8;
+            box-shadow: 0 0 8px rgba(56, 189, 248, 0.3);
+        }
+
+        button {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #38bdf8, #2563eb);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        /* شاشة المحاكاة والبطاقة */
+        .preview-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 25px;
+        }
+
+        /* حاوية البطاقة ثلاثية الأبعاد */
+        .card-container {
+            perspective: 1000px;
+        }
+
+        .card {
+            width: 350px;
+            height: 210px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            border-radius: 16px;
+        }
+
+        /* تأثير الدوران عند التمرير بالماوس */
+        .card-container:hover .card {
+            transform: rotateY(180deg);
+        }
+
+        /* الوجه والخلفية */
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* خلفية البطاقة */
+        .card-back {
+            transform: rotateY(180deg);
+            background: linear-gradient(135deg, #1e1b4b, #311042);
+        }
+
+        /* تأثير التدمير والإلغاء بصرياً */
+        .card.destroyed .card-front,
+        .card.destroyed .card-back {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            opacity: 0.4;
+            filter: grayscale(100%);
+        }
+
+        /* واجهة البطاقة الأمامية */
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-logo {
+            font-weight: bold;
+            font-size: 1.1rem;
+            background: linear-gradient(45deg, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card-chip {
+            width: 45px;
+            height: 35px;
+            background: linear-gradient(135deg, #fef08a, #ca8a04);
+            border-radius: 6px;
+        }
+
+        .card-number {
+            font-size: 1.3rem;
+            letter-spacing: 3px;
+            font-family: monospace;
+            text-align: center;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #cbd5e1;
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .status-active {
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+        }
+
+        .status-inactive {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+        }
+
+        /* الشريط المغناطيسي والتوقيع في الخلف */
+        .magnetic-strip {
+            width: calc(100% + 40px);
+            height: 35px;
+            background: #000;
+            position: relative;
+            right: -20px;
+        }
+
+        .signature-area {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fff;
+            color: #000;
+            padding: 6px;
+            border-radius: 4px;
+        }
+
+        .signature {
+            font-family: 'Courier New', Courier, monospace;
+            font-style: italic;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .cvv-box {
+            background: #e2e8f0;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        /* مخرجات شاشة المحاكاة والسجلات */
+        .terminal {
+            width: 100%;
+            background: #020617;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            min-height: 120px;
+            max-height: 150px;
+            overflow-y: auto;
+            color: #38bdf8;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- لوحة التحكم بالمدخلات والمحاكاة -->
+        <div class="control-panel">
+            <h2>إعداد البطاقة المؤقتة</h2>
+            <div class="input-group">
+                <label for="limitInput">الحد المالي الأقصى للبطاقة (ريال/دولار):</label>
+                <input type="number" id="limitInput" value="50" placeholder="مثال: 50">
+            </div>
+            <button class="btn-primary" onclick="createCard()">إصدار بطاقة جديدة ⚡</button>
+
+            <h2 style="margin-top: 15px;">بوابة دفع المتجر (محاكاة الشراء)</h2>
+            <div class="input-group">
+                <label for="amountInput">مبلغ الشراء المطلوب خصمه:</label>
+                <input type="number" id="amountInput" placeholder="مثال: 45">
+            </div>
+            <div class="input-group">
+                <label for="cvvInput">أدخل الرمز الأمني للبطاقة (CVV):</label>
+                <input type="text" id="cvvInput" placeholder="مثال: 782">
+            </div>
+            <button class="btn-primary" style="background: linear-gradient(135deg, #10b981, #059669);" onclick="processPayment()">تنفيذ عملية الدفع 💳</button>
+        </div>
+
+        <!-- معاينة البطاقة وحالة النظام البصرية -->
+        <div class="preview-panel">
+            <!-- كود معاينة البطاقة ثلاثية الأبعاد -->
+            <div class="card-container">
+                <div class="card" id="cardVisual">
+                    
+                    <!-- الوجه الأمامي -->
+                    <div class="card-front">
+                        <span class="status-badge status-active" id="cardStatus">نشطة</span>
+                        <div class="card-header">
+                            <span class="card-logo">بطاقة آمنة مؤقتة</span>
+                            <div class="card-chip"></div>
+                        </div>
+                        <div class="card-number">4111 2222 3333 4444</div>
+                        <div class="card-footer">
+                            <div>
+                                <div style="font-size: 0.6rem; color: #94a3b8; text-transform: uppercase;">الحد المالي</div>
+                                <div>$<span id="limitVal">50</span></div>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.6rem; color: #94a3b8; text-transform: uppercase;">مرري الماوس للقلب</div>
+                                <div>للاستخدام مرة واحدة</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- الوجه الخلفي للبطاقة -->
+                    <div class="card-back">
+                        <div class="magnetic-strip"></div>
+                        <div class="signature-area">
+                            <span class="signature">Dynamic Card User</span>
+                            <div class="cvv-box">CVV: <span id="cvvVal">782</span></div>
+                        </div>
+                        <p style="font-size: 0.55rem; color: #94a3b8; line-height: 1.2; text-align: justify; direction: rtl;">
+                            هذه البطاقة مخصصة للاستخدام الفردي الآمن وتدمر بياناتها تلقائياً فور نجاح أول عملية شراء، أي محاولة استخدام لاحقة سيتم رفضها تلقائياً من قبل النظام.
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- سجلات النظام والمخرجات -->
+            <div style="width: 100%;">
+                <label style="display: block; margin-bottom: 5px; font-size: 0.9rem; color: #94a3b8;">مخرجات نظام التحقق والـ Self-Destruction:</label>
+                <div class="terminal" id="terminalOutput">
+                    &gt; تم تهيئة النظام. بانتظار إصدار البطاقة وبدء المحاكاة...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // الكائن يحاكي فئة DisposableCard البرمجية
+        let currentCard = {
+            cardNumber: "4111222233334444",
+            maxLimit: 50,
+            dynamicCVV: "782",
+            isActive: true
+        };
+
+        const terminal = document.getElementById("terminalOutput");
+
+        function logToTerminal(message) {
+            terminal.innerHTML += `<br>&gt; ${message}`;
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        // 1. وظيفة إصدار البطاقة
+        function createCard() {
+            const limit = parseFloat(document.getElementById("limitInput").value);
+            if (isNaN(limit) || limit <= 0) {
+                alert("الرجاء إدخال حد مالي صحيح!");
+                return;
+            }
+
+            currentCard.maxLimit = limit;
+            currentCard.isActive = true;
+
+            // تحديث واجهة البطاقة الرسومية
+            document.getElementById("limitVal").innerText = limit;
+            const cardVisual = document.getElementById("cardVisual");
+            cardVisual.classList.remove("destroyed");
+            
+            const statusBadge = document.getElementById("cardStatus");
+            statusBadge.innerText = "نشطة";
+            statusBadge.className = "status-badge status-active";
+
+            terminal.innerHTML = `&gt; [تنبيه النظام]: تم إصدار بطاقة جديدة بنجاح بحد مالي ${limit} ريال/دولار.`;
+        }
+
+        // 2. وظيفة معالجة الدفع ومحاكاة التدمير الذاتي (Single-Use Rule)
+        function processPayment() {
+            const amount = parseFloat(document.getElementById("amountInput").value);
+            const inputCVV = document.getElementById("cvvInput").value;
+
+            if (isNaN(amount) || amount <= 0) {
+                logToTerminal("<span style='color: #ef4444;'>❌ خطأ: الرجاء إدخال قيمة صحيحة لعملية الدفع.</span>");
+                return;
+            }
+
+            // أ. التحقق من حالة نشاط البطاقة
+            if (!currentCard.isActive) {
+                logToTerminal("<span style='color: #ef4444;'>❌ عملية مرفوضة: البطاقة تم تدميرها وإلغاء بياناتها مسبقاً!</span>");
+                return;
+            }
+
+            // ب. التحقق من الرمز الأمني (CVV)
+            if (inputCVV !== currentCard.dynamicCVV) {
+                logToTerminal("<span style='color: #ef4444;'>❌ عملية مرفوضة: الرمز الأمني (CVV) المدخل غير صحيح!</span>");
+                return;
+            }
+
+            // ج. فحص تخطي الحد المالي الأقصى للبطاقة
+            if (amount > currentCard.maxLimit) {
+                logToTerminal(`<span style='color: #ef4444;'>❌ عملية مرفوضة: مبلغ الشراء المطلوب (${amount}) يتجاوز الحد المالي للبطاقة (${currentCard.maxLimit})!</span>`);
+                return;
+            }
+
+            // د. نجاح العملية والبدء الفوري في عملية التدمير الذاتي
+            currentCard.isActive = false;
+
+            // تفعيل تأثير التدمير البصري على واجهة البطاقة
+            const cardVisual = document.getElementById("cardVisual");
+            cardVisual.classList.add("destroyed");
+
+            const statusBadge = document.getElementById("cardStatus");
+            statusBadge.innerText = "ملغية ومتلفة";
+            statusBadge.className = "status-badge status-inactive";
+
+            logToTerminal(`<span style='color: #4ade80;'>✅ تم خصم ${amount} بنجاح.</span>`);
+            logToTerminal("<span style='color: #f87171;'>⚠️ [تنشيط البروتوكول الأمني]: تم إتلاف بيانات البطاقة وتدميرها ذاتياً فوراً لمنع أي استخدام لاحق!</span>");
+        }
+    </script>
+</body>
+</html>
