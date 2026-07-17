@@ -9,8 +9,7 @@
 
 ## 📺 تجربة حية للمشروع (Video Demo)
 
-<!-- https://youtube.com/shorts/a2lFLFTfwNQ?feature=share -->
-<video src="[اضغط هنا](https://youtube.com/shorts/a2lFLFTfwNQ?feature=share)" width="100%" controls></video>
+[![Watch the Demo](https://img.shields.io/badge/▶_Watch-Video_Demo-red?style=for-the-badge&logo=youtube)](https://youtube.com/shorts/a2lFLFTfwNQ?feature=share)
 
 ---
 
