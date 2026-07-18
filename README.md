@@ -69,6 +69,7 @@
 يمكنك تشغيل وتجربة التطبيق الرئيسي للمشروع مباشرة عبر المتصفح ودون الحاجة لأي تثبيت أو إعداد محلي، من خلال رابط العرض المباشر المرفوع على منصة Netlify:
 
 You can access and run the main application live deployment directly through the browser without any local setup here:
+
 👉 [Tirs Main App Live Demo](https://ters-alinma.netlify.app/)
 
 ---
