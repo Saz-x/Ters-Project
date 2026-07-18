@@ -172,7 +172,7 @@ class AlinmaSafePayScreen extends StatefulWidget {
 }
 
 class _AlinmaSafePayScreenState extends State<AlinmaSafePayScreen> {
-  final String backendUrl = "http://127.0.0.1:8000"; 
+  final String backendUrl = "https://ters-alinma.onrender.com"; 
   Map<String, dynamic>? activeCard;
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _payAmountController = TextEditingController();
