@@ -53,7 +53,7 @@
 
 ```text
 ├── Backend/            # Secure Banking Engine & Micro-Rule API (FastAPI) / محرك الأمان المالي
-├── Demo/               # Video Demo demonstrating live platform testing / مقطع الفيديو التوضيحي والتجربة الحية
+├── Additional Demo/    # Video Demo demonstrating live platform testing / مقطع الفيديو التوضيحي والتجربة الحية
 ├── Frontend/           # Cross-platform Mobile Application (Flutter) / تطبيق الجوال والواجهات الذكية
 ├── MVP/                # Minimum Viable Product executable core / النسخة الأولية المصغرة والمنتج القابل للتشغيل
 ├── Presentation/       # Hackathon pitch deck and slides (PDF/PPTX) / ملف العرض التقديمي الخاص بالمنصة
@@ -64,37 +64,13 @@
 
 ---
 
-## 🚀 التشغيل والتثبيت المحلي (Setup & Installation)
+## 🚀 تشغيل وتجربة التطبيق (Run the Application)
 
-### 📋 المتطلبات المسبقة (Prerequisites)
-- **Frontend:** Flutter SDK (Latest Stable Version) & Dart
-- **Backend:** Python 3.10+ & Pip package manager
+يمكنك تشغيل وتجربة التطبيق الرئيسي للمشروع مباشرة عبر المتصفح ودون الحاجة لأي تثبيت أو إعداد محلي، من خلال رابط العرض المباشر المرفوع على منصة Netlify:
 
----
+You can access and run the main application live deployment directly through the browser without any local setup here:
+👉 [Tirs Main App Live Demo](https://ters-alinma.netlify.app/)
 
-### 🛠️ خطوات التشغيل (Execution Steps)
-
-#### 1. استنساخ المستودع (Clone the Repository)
-```bash
-git clone [https://github.com/Saz-x/Repository.git](https://github.com/Saz-x/Repository.git)
-cd ters
-   ```
-# الانتقال لمجلد الباكيند
-cd Backend
-
-# تثبيت مكتبات التشفير والـ API المطلوبة
-python -m pip install fastapi uvicorn pyotp cryptography
-
-# تشغيل خادم SafePay المحلي
-uvicorn main:app --reload
-# الانتقال لمجلد الفلاتر
-cd ../Frontend
-
-# تحميل حزم ومكتبات Flutter الاعتمادية
-flutter pub get
-
-# تشغيل التطبيق على المحاكي (Emulator) أو الهاتف المحمول
-flutter run
 ---
 
 ## 📄 الترخيص وحماية الملكية (License & Copyright)
