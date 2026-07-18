@@ -179,20 +179,25 @@ class _AlinmaSafePayScreenState extends State<AlinmaSafePayScreen> {
   Timer? _timer;
   int _secondsLeft = 30;
 
-  @override
-  void initState() {
-    super.initState();
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (activeCard != null && activeCard!['is_active'] == true) {
-        setState(() {
-          _secondsLeft = 30 - (DateTime.now().second % 30);
-          if (_secondsLeft == 30) {
-            _fetchCardStatus(activeCard!['card_number']);
-          }
-        });
-      }
-    });
-  }
+@override
+void initState() {
+  super.initState();
+  // New Timer: Smooth local countdown independent of the device system clock
+  _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    if (activeCard != null && activeCard!['is_active'] == true) {
+      setState(() {
+        if (_secondsLeft > 1) {
+          _secondsLeft--; // Decrement by 1 second every tick
+        } else {
+          _secondsLeft = 30; // Reset countdown to 30 seconds immediately when hitting 0
+          
+          // Fetch updated CVV from the backend in the background without freezing the UI
+          _fetchCardStatus(activeCard!['card_number']);
+        }
+      });
+    }
+  });
+}
 
   @override
   void dispose() {
@@ -202,23 +207,24 @@ class _AlinmaSafePayScreenState extends State<AlinmaSafePayScreen> {
     super.dispose();
   }
 
-  Future<void> _createNewCard(double limit) async {
-    try {
-      final response = await http.post(
-        Uri.parse('$backendUrl/create-card/'),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"limit_amount": limit}),
-      );
+Future<void> _createNewCard(double limit) async {
+  try {
+    final response = await http.post(
+      Uri.parse('$backendUrl/create-card/'),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({"limit_amount": limit}),
+    );
 
-      if (response.statusCode == 200) {
-        setState(() {
-          activeCard = jsonDecode(response.body);
-        });
-      }
-    } catch (e) {
-      _showSnackBar("فشل الاتصال بالسيرفر. تأكد من تشغيل الـ Backend!");
+    if (response.statusCode == 200) {
+      setState(() {
+        activeCard = jsonDecode(response.body);
+        _secondsLeft = 30; //  Reset countdown to 30 seconds as soon as the card is created!
+      });
     }
+  } catch (e) {
+    _showSnackBar("Failed to connect to the server. Please ensure the Backend is running!");
   }
+}
 
   Future<void> _fetchCardStatus(String cardNumber) async {
     try {
