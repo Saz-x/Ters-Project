@@ -1,0 +1,1 @@
+You can access the live deployment of our main application here: [Ters Main App Demo](https://ters-alinma.netlify.app/)
